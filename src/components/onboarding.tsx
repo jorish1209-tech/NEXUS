@@ -23,10 +23,12 @@ export function Onboarding({ initialProfile, onComplete }: { initialProfile?: Us
   const canContinue = isTimeStep ? profile.birthTimeUnknown || Boolean(value.trim()) : Boolean(value.trim());
 
   const update = (key: keyof UserProfile, nextValue: string | boolean) => setProfile((previous) => ({ ...previous, [key]: nextValue }));
+  const updateBirthTime = (birthTime: string) => setProfile((previous) => ({ ...previous, birthTime, birthTimeUnknown: false }));
+  const setBirthTimeUnknown = (birthTimeUnknown: boolean) => setProfile((previous) => ({ ...previous, birthTimeUnknown, birthTime: birthTimeUnknown ? "" : previous.birthTime }));
   const next = () => {
     if (!canContinue) return;
     if (step === steps.length - 1) {
-      onComplete({ ...profile, nickname: profile.nickname.trim(), birthCity: profile.birthCity.trim() });
+      onComplete({ ...profile, nickname: profile.nickname.trim(), birthCity: profile.birthCity.trim(), birthTime: profile.birthTimeUnknown ? "" : profile.birthTime });
     } else {
       setStep((previous) => previous + 1);
     }
@@ -45,10 +47,10 @@ export function Onboarding({ initialProfile, onComplete }: { initialProfile?: Us
       autoFocus
       disabled={isTimeStep && profile.birthTimeUnknown}
       max={current.key === "birthDate" ? localToday() : undefined}
-      onChange={(event) => update(current.key, event.target.value)}
+      onChange={(event) => isTimeStep ? updateBirthTime(event.target.value) : update(current.key, event.target.value)}
       onKeyDown={(event) => event.key === "Enter" && next()}
     />
-    {isTimeStep && <label className="check-row"><input type="checkbox" checked={profile.birthTimeUnknown} onChange={(event) => update("birthTimeUnknown", event.target.checked)} /> <span>我不知道出生时间</span></label>}
+    {isTimeStep && <label className="check-row"><input type="checkbox" checked={profile.birthTimeUnknown} onChange={(event) => setBirthTimeUnknown(event.target.checked)} /> <span>我不知道出生时间</span></label>}
     {step > 0 && <button className="secondary" style={{ marginTop: 25 }} onClick={() => setStep((previous) => previous - 1)}>上一步</button>}
     <div className="bottom-action"><button className="primary" style={{ width: "100%", opacity: canContinue ? 1 : .45 }} onClick={next}>{step === steps.length - 1 ? "生成我的观察" : "继续"}</button></div>
   </section>;
