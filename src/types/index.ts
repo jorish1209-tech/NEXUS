@@ -2,6 +2,7 @@ export type UserProfile = {
   nickname: string;
   birthDate: string;
   birthTime: string;
+  birthTimeUnknown: boolean;
   birthCity: string;
 };
 

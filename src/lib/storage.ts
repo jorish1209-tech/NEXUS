@@ -10,6 +10,7 @@ export function getProfile(): UserProfile | null {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null") as UserProfile | null; } catch { return null; }
 }
 export function saveProfile(profile: UserProfile) { if (canUseStorage()) localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }
+export function clearProfile() { if (canUseStorage()) localStorage.removeItem(PROFILE_KEY); }
 export function getFeedback(): Feedback[] {
   if (!canUseStorage()) return [];
   try { return JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]") as Feedback[]; } catch { return []; }

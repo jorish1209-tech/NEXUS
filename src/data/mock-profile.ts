@@ -8,10 +8,19 @@ export const chartSections = [
   { title: "当前成长课题", tags: ["表达", "松动", "信任过程"], text: "不必等到万无一失才说出你的想法。试着让未完成的感受也有出口，在过程中修正。允许自己被看见，是你正在练习的一种力量。" },
 ] as const;
 
-export const today = {
-  sentence: "今天不需要急着证明自己。",
-  tags: ["收束", "观察", "边界"],
-  observation: "你可能比平时更在意外界的评价。真正消耗你的，不一定是事情本身，而是你反复推演别人会如何看待你。",
-  action: "做决定之前，先区分真实问题和想象中的压力。",
-  question: "如果不需要向任何人证明，你会怎么选择？",
-};
+export const dailyEntries = [
+  { sentence: "今天不需要急着证明自己。", tags: ["收束", "观察", "边界"], observation: "你可能比平时更在意外界的评价。真正消耗你的，不一定是事情本身，而是你反复推演别人会如何看待你。", action: "做决定之前，先区分真实问题和想象中的压力。", question: "如果不需要向任何人证明，你会怎么选择？" },
+  { sentence: "先把注意力交还给自己。", tags: ["回到当下", "节奏", "松动"], observation: "外界的节奏容易让你觉得落后，但你真正需要的不是跟上所有人，而是辨认什么值得被认真完成。给自己留一点不被催促的时间。", action: "删去一件并不重要、却一直占据注意力的事。", question: "今天，什么会让你重新感到自在？" },
+  { sentence: "不必为每一种沉默寻找答案。", tags: ["信任", "留白", "感受"], observation: "你也许正在从细节里推测他人的态度。关系里有些空白不等于拒绝，先允许它停在那里，感受会比解释更早告诉你真实的方向。", action: "把想问的问题写下，晚一点再决定是否需要说出口。", question: "你想确认的，究竟是对方的态度，还是自己的价值？" },
+  { sentence: "慢一点，也是在前进。", tags: ["耐心", "专注", "积累"], observation: "当结果尚未出现时，你容易怀疑投入是否有意义。其实许多改变正在安静发生，只是还没有形成能够被量化的样子。", action: "完成一个小而具体的动作，不给它附加额外标准。", question: "如果不以速度衡量自己，你会如何定义今天的进展？" },
+  { sentence: "把真实的需要说得更清楚一点。", tags: ["表达", "连接", "边界"], observation: "你习惯先理解别人的处境，自己的需要却常常被放到最后。温和地表达并不会破坏关系，清楚反而能让彼此靠得更近。", action: "用一句具体的话，说出你希望被怎样支持。", question: "此刻你最希望别人理解你的哪一部分？" },
+] as const;
+
+function localDayNumber(date: Date) {
+  const localMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return Math.floor(localMidnight.getTime() / 86_400_000);
+}
+
+export function getDailyEntry(date = new Date()) {
+  return dailyEntries[((localDayNumber(date) % dailyEntries.length) + dailyEntries.length) % dailyEntries.length];
+}
