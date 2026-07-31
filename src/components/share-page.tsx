@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
 import { brand } from "@/config/brand";
-import { generateShareCard } from "@/services/generation";
+import { useDemoContent } from "@/services/generation/demo-content";
 import { downloadFile, pngFileFromSvg } from "@/lib/png-export";
 import type { UserProfile } from "@/types";
 
-function makeSvg(card: ReturnType<typeof generateShareCard>[number]) {
+function makeSvg(card: { eyebrow: string; text: string }) {
   const escape = (text: string) => text.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&apos;" }[character] || character));
   const lines = card.text.match(/.{1,14}/g) || [card.text];
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1420" viewBox="0 0 1080 1420"><rect width="1080" height="1420" fill="#25344b"/><ellipse cx="910" cy="460" rx="430" ry="150" fill="none" stroke="#ffffff" stroke-opacity=".27" stroke-width="2" transform="rotate(-28 910 460)"/><ellipse cx="860" cy="500" rx="270" ry="270" fill="none" stroke="#ffffff" stroke-opacity=".2" stroke-width="2"/><text x="80" y="105" font-family="Arial,sans-serif" font-size="25" fill="#f9f5ed" letter-spacing="8">${escape(brand.name)}</text><text x="80" y="166" font-family="Arial,sans-serif" font-size="18" fill="#d6d2c8" letter-spacing="5">${escape(card.eyebrow)}</text>${lines.map((line, index) => `<text x="80" y="${470 + index * 90}" font-family="serif" font-size="64" fill="#f9f5ed">${escape(line)}</text>`).join("")}<line x1="80" y1="1240" x2="1000" y2="1240" stroke="#ffffff" stroke-opacity=".3"/><text x="80" y="1305" font-family="Arial,sans-serif" font-size="22" fill="#d6d2c8" letter-spacing="4">${escape(brand.subtitle.toUpperCase())}</text></svg>`;
@@ -27,7 +27,9 @@ async function copyText(text: string) {
 export function SharePage({ profile, onFeedback }: { profile: UserProfile; onFeedback: () => void }) {
   const [selected, setSelected] = useState(0);
   const [message, setMessage] = useState("");
-  const cards = generateShareCard(profile);
+  const content = useDemoContent(profile);
+  const cards = content?.shareCards;
+  if (!cards) return <section className="page" aria-busy="true" />;
   const card = cards[selected];
   const saveImage = async () => {
     try {
