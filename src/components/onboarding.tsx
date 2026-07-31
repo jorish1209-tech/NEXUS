@@ -9,14 +9,14 @@ const localToday = () => {
 
 const steps = [
   { label: "怎么称呼你？", hint: "这是属于你的内在观察。", key: "nickname", type: "text", placeholder: "输入昵称" },
-  { label: "你出生在哪一天？", hint: "我们用它建立你的观察起点。", key: "birthDate", type: "date", placeholder: "" },
+  { label: "你出生在哪一天？", hint: "我们用它建立你的观察起点。", key: "birthday", type: "date", placeholder: "" },
   { label: "大约在什么时间？", hint: "不知道准确时间也没关系。", key: "birthTime", type: "time", placeholder: "" },
-  { label: "你的出生城市是？", hint: "填写城市即可，无需详细地址。", key: "birthCity", type: "text", placeholder: "例如：上海" },
+  { label: "你的出生城市是？", hint: "填写城市即可，无需详细地址。", key: "location", type: "text", placeholder: "例如：上海" },
 ] as const;
 
 export function Onboarding({ initialProfile, onComplete }: { initialProfile?: UserProfile; onComplete: (profile: UserProfile) => void }) {
   const [step, setStep] = useState(0);
-  const [profile, setProfile] = useState<UserProfile>(initialProfile ?? { nickname: "", birthDate: "", birthTime: "", birthTimeUnknown: false, birthCity: "" });
+  const [profile, setProfile] = useState<UserProfile>(initialProfile ?? { nickname: "", birthday: "", birthTime: "", birthTimeUnknown: false, location: "" });
   const current = steps[step];
   const value = profile[current.key];
   const isTimeStep = current.key === "birthTime";
@@ -28,7 +28,7 @@ export function Onboarding({ initialProfile, onComplete }: { initialProfile?: Us
   const next = () => {
     if (!canContinue) return;
     if (step === steps.length - 1) {
-      onComplete({ ...profile, nickname: profile.nickname.trim(), birthCity: profile.birthCity.trim(), birthTime: profile.birthTimeUnknown ? "" : profile.birthTime });
+      onComplete({ ...profile, nickname: profile.nickname.trim(), location: profile.location.trim(), birthTime: profile.birthTimeUnknown ? "" : profile.birthTime });
     } else {
       setStep((previous) => previous + 1);
     }
@@ -46,7 +46,7 @@ export function Onboarding({ initialProfile, onComplete }: { initialProfile?: Us
       placeholder={current.placeholder}
       autoFocus
       disabled={isTimeStep && profile.birthTimeUnknown}
-      max={current.key === "birthDate" ? localToday() : undefined}
+      max={current.key === "birthday" ? localToday() : undefined}
       onChange={(event) => isTimeStep ? updateBirthTime(event.target.value) : update(current.key, event.target.value)}
       onKeyDown={(event) => event.key === "Enter" && next()}
     />

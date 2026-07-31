@@ -1,10 +1,10 @@
-import { getDailyEntry } from "@/data/mock-profile";
+import { generateToday } from "@/services/generation";
 import type { UserProfile } from "@/types";
 
 function dateLabel() { return new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric", weekday: "short" }).format(new Date()); }
 
 export function TodayPage({ profile, onSettings, onFeedback }: { profile: UserProfile; onSettings: () => void; onFeedback: () => void }) {
-  const today = getDailyEntry();
+  const today = generateToday(profile);
   return <section className="page">
     <header style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
       <div><p className="eyebrow" style={{ margin: 0 }}>你好，{profile.nickname}</p><p style={{ fontSize: 13, margin: "7px 0 0", color: "var(--muted)" }}>{dateLabel()}</p></div>

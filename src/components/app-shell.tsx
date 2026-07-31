@@ -40,8 +40,8 @@ export function AppShell() {
   if (!profile) return null;
   return <main className="phone">
     {screen === "today" && <TodayPage profile={profile} onSettings={() => setScreen("settings")} onFeedback={() => openFeedback("Today")} />}
-    {screen === "chart" && <ChartPage onFeedback={() => openFeedback("Chart")} />}
-    {screen === "share" && <SharePage onFeedback={() => openFeedback("Share")} />}
+    {screen === "chart" && <ChartPage profile={profile} onFeedback={() => openFeedback("Chart")} />}
+    {screen === "share" && <SharePage profile={profile} onFeedback={() => openFeedback("Share")} />}
     {screen === "settings" && <SettingsPage profile={profile} feedbackPage={feedbackPage} onBack={() => setScreen("today")} onSaveProfile={updateProfile} onReset={resetProfile} />}
     {screen !== "settings" && <BottomNav screen={screen} setScreen={setScreen} />}
   </main>;
