@@ -1,4 +1,5 @@
 import type { UserProfile } from "@/types";
+import type { BirthChartData } from "@/services/astrology";
 
 export type TodayContent = {
   sentence: string;
@@ -28,6 +29,7 @@ export type PersonalizedContent = {
 
 export type GenerationContext = {
   profile: UserProfile;
+  astrology: BirthChartData;
   language: string;
   timezone: string;
   currentDate: string;

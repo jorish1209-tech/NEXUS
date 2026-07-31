@@ -1,4 +1,5 @@
 import { chartSections, dailyEntries } from "@/data/mock-profile";
+import { calculateBirthChart } from "@/services/astrology";
 import type { UserProfile } from "@/types";
 import type { ChartSection, GenerationContext, TodayContent } from "./types";
 
@@ -16,6 +17,7 @@ export function createGenerationContext(profile: UserProfile): GenerationContext
   const now = new Date();
   return {
     profile,
+    astrology: calculateBirthChart(profile),
     language: "zh-CN",
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     currentDate: now.toISOString().slice(0, 10),
