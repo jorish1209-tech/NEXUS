@@ -9,7 +9,7 @@ import { SettingsPage } from "@/components/settings-page";
 import { SharePage } from "@/components/share-page";
 import { TodayPage } from "@/components/today-page";
 import { Welcome } from "@/components/welcome";
-import { getProfile, saveProfile } from "@/lib/storage";
+import { clearProfile, getProfile, saveProfile } from "@/lib/storage";
 import type { UserProfile } from "@/types";
 
 export type Screen = "today" | "chart" | "share" | "settings";
@@ -19,6 +19,7 @@ export function AppShell() {
   const [flow, setFlow] = useState<Flow>("loading");
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [screen, setScreen] = useState<Screen>("today");
+  const [feedbackPage, setFeedbackPage] = useState("设置 / 反馈");
   useEffect(() => {
     const saved = getProfile();
     const timer = window.setTimeout(() => {
@@ -29,10 +30,19 @@ export function AppShell() {
   }, []);
   const complete = useCallback((nextProfile: UserProfile) => { saveProfile(nextProfile); setProfile(nextProfile); setFlow("generating"); }, []);
   const openApp = useCallback(() => setFlow("app"), []);
+  const openFeedback = useCallback((page: string) => { setFeedbackPage(page); setScreen("settings"); }, []);
+  const updateProfile = useCallback((nextProfile: UserProfile) => { saveProfile(nextProfile); setProfile(nextProfile); }, []);
+  const resetProfile = useCallback(() => { clearProfile(); setProfile(null); setScreen("today"); setFeedbackPage("设置 / 反馈"); setFlow("welcome"); }, []);
   if (flow === "loading") return <main className="phone" />;
   if (flow === "welcome") return <main className="phone"><Welcome onStart={() => setFlow("onboarding")} /></main>;
   if (flow === "onboarding") return <main className="phone"><Onboarding onComplete={complete} /></main>;
   if (flow === "generating") return <main className="phone"><Generating onDone={openApp} /></main>;
   if (!profile) return null;
-  return <main className="phone">{screen === "today" && <TodayPage profile={profile} onSettings={() => setScreen("settings")} />}{screen === "chart" && <ChartPage />}{screen === "share" && <SharePage />}{screen === "settings" && <SettingsPage profile={profile} onBack={() => setScreen("today")} />}{screen !== "settings" && <BottomNav screen={screen} setScreen={setScreen} />}</main>;
+  return <main className="phone">
+    {screen === "today" && <TodayPage profile={profile} onSettings={() => setScreen("settings")} onFeedback={() => openFeedback("Today")} />}
+    {screen === "chart" && <ChartPage profile={profile} onFeedback={() => openFeedback("Chart")} />}
+    {screen === "share" && <SharePage profile={profile} onFeedback={() => openFeedback("Share")} />}
+    {screen === "settings" && <SettingsPage profile={profile} feedbackPage={feedbackPage} onBack={() => setScreen("today")} onSaveProfile={updateProfile} onReset={resetProfile} />}
+    {screen !== "settings" && <BottomNav screen={screen} setScreen={setScreen} />}
+  </main>;
 }

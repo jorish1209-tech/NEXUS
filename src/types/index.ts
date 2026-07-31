@@ -1,8 +1,9 @@
 export type UserProfile = {
   nickname: string;
-  birthDate: string;
+  birthday: string;
   birthTime: string;
-  birthCity: string;
+  birthTimeUnknown: boolean;
+  location: string;
 };
 
 export type FeedbackType = "Bug" | "内容不准确" | "页面不好用" | "视觉问题" | "功能建议";

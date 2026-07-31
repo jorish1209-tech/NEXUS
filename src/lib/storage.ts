@@ -7,9 +7,20 @@ function canUseStorage() { return typeof window !== "undefined"; }
 
 export function getProfile(): UserProfile | null {
   if (!canUseStorage()) return null;
-  try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null") as UserProfile | null; } catch { return null; }
+  try {
+    const stored = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null") as (Partial<UserProfile> & { birthDate?: string; birthCity?: string }) | null;
+    if (!stored) return null;
+    return {
+      nickname: stored.nickname || "",
+      birthday: stored.birthday || stored.birthDate || "",
+      birthTime: stored.birthTime || "",
+      birthTimeUnknown: Boolean(stored.birthTimeUnknown),
+      location: stored.location || stored.birthCity || "",
+    };
+  } catch { return null; }
 }
-export function saveProfile(profile: UserProfile) { if (canUseStorage()) localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }
+export function saveProfile(profile: UserProfile) { if (canUseStorage()) localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...profile, birthTime: profile.birthTimeUnknown ? "" : profile.birthTime })); }
+export function clearProfile() { if (canUseStorage()) localStorage.removeItem(PROFILE_KEY); }
 export function getFeedback(): Feedback[] {
   if (!canUseStorage()) return [];
   try { return JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]") as Feedback[]; } catch { return []; }
