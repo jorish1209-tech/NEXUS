@@ -28,5 +28,10 @@ export type PersonalizedContent = {
 
 export type GenerationContext = {
   profile: UserProfile;
+  language: string;
+  timezone: string;
+  currentDate: string;
+  userHistory: ReadonlyArray<{ date: string; event: string }>;
+  generationVersion: string;
   seed: number;
 };

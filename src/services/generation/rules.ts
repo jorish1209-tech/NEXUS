@@ -13,7 +13,16 @@ function hash(value: string) {
 
 export function createGenerationContext(profile: UserProfile): GenerationContext {
   const identity = [profile.nickname, profile.birthday, profile.birthTimeUnknown ? "unknown" : profile.birthTime, profile.location].join("|");
-  return { profile, seed: hash(identity) };
+  const now = new Date();
+  return {
+    profile,
+    language: "zh-CN",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    currentDate: now.toISOString().slice(0, 10),
+    userHistory: [],
+    generationVersion: "local-rules-v1",
+    seed: hash(identity),
+  };
 }
 
 function pick<T>(items: readonly T[], seed: number, offset = 0) {
