@@ -1,5 +1,7 @@
 import { chartSections, dailyEntries } from "@/data/mock-profile";
 import { calculateBirthChart } from "@/services/astrology";
+import { mapChartSignals } from "@/services/astrology/personality-map";
+import type { ChartContent } from "@/services/ai/types";
 import type { UserProfile } from "@/types";
 import type { ChartSection, GenerationContext, TodayContent } from "./types";
 
@@ -51,22 +53,40 @@ const questions = [
 
 export function generateTodayWithRules(context: GenerationContext): TodayContent {
   const base = pick(dailyEntries, context.seed);
+  const signals = mapChartSignals(context.astrology);
   return {
     ...base,
-    tags: [...base.tags],
+    tags: [base.tags[0], signals.sun.keyword, signals.moon.keyword],
     sentence: `${context.profile.nickname}，${base.sentence.replace(/^今天/, "今天")}`,
-    observation: pick(observations, context.seed, 1),
-    action: pick(actions, context.seed, 2),
+    observation: `${pick(observations, context.seed, 1)} ${signals.moon.need}。`,
+    action: `${pick(actions, context.seed, 2)} ${signals.rising.expression}。`,
     question: pick(questions, context.seed, 3),
   };
 }
 
+export function generateChartContentWithRules(context: GenerationContext): ChartContent {
+  const signals = mapChartSignals(context.astrology);
+  const dominantElement = Object.entries(context.astrology.elements).sort(([, first], [, second]) => second - first)[0]?.[0] ?? "earth";
+  return {
+    core: `${signals.sun.keyword}与${signals.moon.keyword}并行，外在呈现${signals.rising.keyword}。这是一种关于自我节奏的观察，不是对你的定义。`,
+    personality: `太阳带来${signals.sun.strength}的倾向，月亮则需要${signals.moon.need}。你可以在表达目标时，也为感受留出空间。`,
+    strengths: [signals.sun.strength, signals.moon.keyword, signals.rising.expression],
+    challenges: [signals.sun.tension, signals.moon.tension, `${dominantElement}元素需要被平衡`],
+    career: `当方向对你有意义时，${signals.sun.strength}会成为持续行动的支点；${signals.rising.expression}。`,
+    relationship: `关系中你可能先表现为${signals.rising.keyword}，内在却更在意${signals.moon.need}。清楚表达边界，有助于建立真实连接。`,
+  };
+}
+
 export function generateChartWithRules(context: GenerationContext): ChartSection[] {
-  return chartSections.map((section, index) => ({
-    ...section,
-    tags: [...section.tags].map((tag, tagIndex) => tagIndex === 0 && index % 2 === context.seed % 2 ? `${tag} · ${context.profile.location}` : tag),
-    text: `${section.text} ${index === context.seed % chartSections.length ? `这份观察也与你在${context.profile.location}建立的生活节奏有关。` : ""}`.trim(),
-  }));
+  const generated = generateChartContentWithRules(context);
+  return [
+    { title: "核心人格", tags: generated.strengths.slice(0, 2), text: generated.core },
+    { title: "情绪模式", tags: [generated.personality], text: generated.personality },
+    { title: "内在需求", tags: generated.challenges.slice(0, 2), text: generated.relationship },
+    { title: "行动力来源", tags: generated.strengths.slice(0, 2), text: generated.career },
+    { title: "压力反应", tags: generated.challenges.slice(0, 2), text: generated.challenges.join("、") },
+    { title: "人生主题", tags: [generated.core], text: generated.relationship },
+  ];
 }
 
 export function fallbackToday(): TodayContent {

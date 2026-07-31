@@ -1,4 +1,4 @@
-import { generateChartWithRules, generateTodayWithRules } from "@/services/generation/rules";
+import { generateChartContentWithRules, generateTodayWithRules } from "@/services/generation/rules";
 import type { UserProfile } from "@/types";
 import type { AIProvider, ChartContent, ShareContent, TodayContent } from "./types";
 import type { GenerationContext } from "@/services/generation/types";
@@ -10,15 +10,7 @@ export class MockAIProvider implements AIProvider {
   }
 
   async generateChart(_profile: UserProfile, context: GenerationContext): Promise<ChartContent> {
-    const sections = generateChartWithRules(context);
-    return {
-      core: sections[0]?.text || "",
-      personality: sections[1]?.text || "",
-      strengths: sections[3]?.tags || [],
-      challenges: sections[4]?.tags || [],
-      career: sections[3]?.text || "",
-      relationship: sections[5]?.text || "",
-    };
+    return generateChartContentWithRules(context);
   }
 
   async generateShare(profile: UserProfile, context: GenerationContext): Promise<ShareContent> {
